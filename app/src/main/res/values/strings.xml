@@ -1,3 +1,6 @@
 <resources>
-    <string name="app_name">FallDetect</string>
+    <string name="app_name" translatable="false">FallDetect</string>
+    <string name="Explainer" formatted="true" >The app uses machine learning to automatically detect if you fall. There is no need for you to configure any settings and an alarm
+        will automatically go off if you fall. Just keep in mind to let the app run in the background for detection to happen! If there\'s a false alarm or help has arrived you can press the STOP ALARM button after which it will take some time to reset</string>
+
 </resources>

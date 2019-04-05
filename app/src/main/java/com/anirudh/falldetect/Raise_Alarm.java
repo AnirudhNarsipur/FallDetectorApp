@@ -42,7 +42,6 @@ public class Raise_Alarm extends IntentService {
                 setPressed(false);
                 handler.post(alarm);
             } else if (STOP.equals(action)) {
-                System.out.println("STOPPING");
                 setPressed(true);
                 stopSelf();
                 handler.post(restart_detect);
@@ -71,12 +70,7 @@ public class Raise_Alarm extends IntentService {
         }
     } ;
 
-    private void handleActionWarn() {
 
-        while (!isPressed())
-        toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD);
-
-    }
 
 
 }

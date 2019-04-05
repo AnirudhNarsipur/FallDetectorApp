@@ -7,7 +7,6 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 
-
 public class MainActivity extends AppCompatActivity {
 
 
@@ -22,13 +21,13 @@ public class MainActivity extends AppCompatActivity {
         Runnable s = new Runnable(){
             @Override
             public void run() {
-                System.out.println("CALLING");
+
                 Intent intent = new Intent(getApplicationContext(),Detect.class) ;
                 startService(intent) ;
             }
         } ;
         handler.post(s) ;
-        Button stop = findViewById(R.id.button) ;
+        Button stop = findViewById(R.id.alarm_button) ;
         stop.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

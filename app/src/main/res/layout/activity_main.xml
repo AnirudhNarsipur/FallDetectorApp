@@ -4,21 +4,46 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:background="@color/App_background"
     tools:context=".MainActivity">
 
     <Button
-        android:id="@+id/button"
-        android:layout_width="0dp"
-        android:layout_height="wrap_content"
+        android:id="@+id/alarm_button"
+        android:layout_width="136dp"
+        android:layout_height="137dp"
         android:layout_marginStart="163dp"
-        android:layout_marginTop="267dp"
+        android:layout_marginTop="261dp"
         android:layout_marginEnd="160dp"
         android:layout_marginBottom="416dp"
-        android:text="STOP"
+        android:background="@drawable/roundedbutton"
+        android:text="Stop Alarm"
+        android:textColor="@color/colorPrimaryDark"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.77"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.421" />
+
+    <TextView
+        android:id="@+id/textView"
+        android:layout_width="0dp"
+        android:layout_height="0dp"
+        android:layout_marginStart="49dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="74dp"
+        android:layout_marginBottom="41dp"
+        android:elegantTextHeight="true"
+        android:text="@string/Explainer"
+        android:textAppearance="@style/TextAppearance.AppCompat"
+        android:textColor="#000000"
+        android:gravity="center"
+        android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.0" />
+        app:layout_constraintTop_toBottomOf="@+id/alarm_button"
+        app:layout_constraintVertical_bias="1.0" />
 
 </android.support.constraint.ConstraintLayout>

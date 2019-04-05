@@ -8,7 +8,6 @@ import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
 import android.os.IBinder;
-
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
@@ -18,16 +17,15 @@ import java.io.InputStream;
 
 public class Detect extends Service implements SensorEventListener {
     final int MAX_SIZE = 90 ;
-    final int timestep = 70 ;
+    final int timeStep = 70 ;
     float threshold  = 0.5f ;
     final int forward_look = 25;
-    float further = 0.4f ;
-    long timepassed = System.currentTimeMillis();
-/*    private CircularFifo<Chronos> time = new CircularFifo<>(MAX_SIZE) ;*/
+    final float further = 0.4f ;
+    long time_passed = System.currentTimeMillis();
+
     private CircularFifo<float[]> acc_values = new CircularFifo<>(MAX_SIZE) ;
     private CircularFifo<float[]>gyro_values = new CircularFifo<>(MAX_SIZE);
-  //  private Queue<float[]> acc_values = EvictingQueue.create(MAX_SIZE) ;
-    //private Queue<float[]> gyro_values = EvictingQueue.create(MAX_SIZE) ;
+
     float acc_current  = SensorManager.GRAVITY_EARTH;
     float acc_previous  = SensorManager.GRAVITY_EARTH;
 
@@ -40,11 +38,11 @@ public class Detect extends Service implements SensorEventListener {
     Handler handler = new Handler();
     ComputationGraph model ;
     public boolean isTimepassed(long t){
-        return ((t-timepassed)>4000) ;
+        return ((t- time_passed)>4000) ;
     }
 
-    public void setTimepassed(long timepassed) {
-        this.timepassed = timepassed;
+    public void setTime_passed(long time_passed) {
+        this.time_passed = time_passed;
     }
 
 
@@ -56,10 +54,9 @@ public class Detect extends Service implements SensorEventListener {
             }
            //  acc_values.setLocked(true);
             //gyro_values.setLocked(true);
-            setTimepassed(System.currentTimeMillis());
+            setTime_passed(System.currentTimeMillis());
             model.rnnClearPreviousState();
             float outputvalue = (model.output(get_vals())[0]).getFloat(0) ;
-            System.out.println("OUTPUT : " + outputvalue);
             if(outputvalue>=threshold) {
                 startService(stop);
 
@@ -84,7 +81,6 @@ public class Detect extends Service implements SensorEventListener {
         public void run() {
             for(int i = 0 ; i <forward_look; i++) {
                 float outputvalue = (model.rnnTimeStep(getSingleVal()))[0].getFloat(0);
-              //  System.out.println("Timestep values: " + i + " " + outputvalue);
                 if (outputvalue > threshold) {
                     reset();
                     startService(stop);
@@ -123,17 +119,15 @@ public class Detect extends Service implements SensorEventListener {
     SensorEventListener sigmotion_detect = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
-            float ev = event.values[1];
-
                 acc_current = acc_previous ;
                 acc_current = ((float) Math.sqrt( (event.values[0] * event.values[0]) + (event.values[1] * event.values[1]) + (event.values[2] * event.values[2]) ));
 
                 float delta  =acc_current-acc_previous ;
 
             if(delta > 2.00 &&isTimepassed(System.currentTimeMillis())){
-                System.out.println("TRIGGERED BY SENSOR!:" + delta);
+
                 handler.post(detecting) ;
-                System.out.println("SIZE IS "+ acc_values.size()  /*+ " LOCKED : " + acc_values.isLocked() */);
+
             }
 
 
@@ -156,12 +150,12 @@ public class Detect extends Service implements SensorEventListener {
         switch (sensor_type) {
             //accelerometer
             case 1:
-                acc_values.addelement(event.values);
+                acc_values.addElement(event.values);
 
                 break;
             //gyrometer
             case 4:
-                gyro_values.addelement(event.values);
+                gyro_values.addElement(event.values);
                 break;
             default:
                 break;
@@ -172,13 +166,11 @@ public class Detect extends Service implements SensorEventListener {
         @Override
         public void run() {
             try{
-                System.out.println("SIZE HERE IS : "  + acc_values.size());
 
-                InputStream is = getResources().openRawResource(R.raw.model_file);
+
+                InputStream is = getResources().openRawResource(R.raw.mostly);
                 model = ModelSerializer.restoreComputationGraph(is) ;
                 model.init();
-
-                System.out.println("SUCCESS!");
                 manager.registerListener(sigmotion_detect,significant_motion,200000);
 
             }catch (Exception e) {
@@ -188,9 +180,9 @@ public class Detect extends Service implements SensorEventListener {
     } ;
     private INDArray get_vals(){
         INDArray ind  ;
-        float[][][] result = new float[1][6][timestep];
+        float[][][] result = new float[1][6][timeStep];
 
-            for (int i = 0; i < timestep; i++) {
+            for (int i = 0; i < timeStep; i++) {
 
 
                 float[] acc = acc_values.removeFirst();
