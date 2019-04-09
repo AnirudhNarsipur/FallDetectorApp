@@ -4,8 +4,64 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:background="@color/App_background"
+    android:background="@color/colorPrimaryDark"
     tools:context=".MainActivity">
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/settings_page"
+        android:layout_width="match_parent"
+        android:layout_height="729dp"
+        android:layout_marginEnd="250dp"
+        android:background="@color/colorPrimary"
+        android:orientation="vertical"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="1.0">
+
+        <Button
+            android:id="@+id/about_button"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="128dp"
+            android:text="@string/about"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <Button
+            android:id="@+id/setContact"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="88dp"
+            android:layout_marginBottom="412dp"
+            android:text="@string/contact"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/about_button" />
+
+        <ImageButton
+            android:id="@+id/Close"
+            android:layout_width="102dp"
+            android:layout_height="92dp"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="19dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/about_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="0.941"
+            app:srcCompat="@drawable/close" />
+
+    </android.support.constraint.ConstraintLayout>
 
     <Button
         android:id="@+id/alarm_button"
@@ -16,34 +72,201 @@
         android:layout_marginEnd="160dp"
         android:layout_marginBottom="416dp"
         android:background="@drawable/roundedbutton"
-        android:text="Stop Alarm"
+        android:text="@string/Alarm"
         android:textColor="@color/colorPrimaryDark"
         android:visibility="visible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.77"
+        app:layout_constraintHorizontal_bias="0.02"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.421" />
+        app:layout_constraintVertical_bias="0.337" />
 
-    <TextView
-        android:id="@+id/textView"
-        android:layout_width="0dp"
-        android:layout_height="0dp"
-        android:layout_marginStart="49dp"
-        android:layout_marginTop="60dp"
-        android:layout_marginEnd="74dp"
-        android:layout_marginBottom="41dp"
-        android:elegantTextHeight="true"
-        android:text="@string/Explainer"
-        android:textAppearance="@style/TextAppearance.AppCompat"
-        android:textColor="#000000"
-        android:gravity="center"
+    <ImageView
+        android:id="@+id/settings_button"
+        android:layout_width="185dp"
+        android:layout_height="130dp"
+        android:layout_marginEnd="249dp"
+        android:clickable="true"
+        android:contentDescription="@string/settings"
         android:visibility="visible"
+        app:layout_constraintBottom_toTopOf="@+id/settings_page"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toEndOf="@+id/settings_page"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0"
+        app:srcCompat="@drawable/icon_settings" />
+
+    <FrameLayout
+        android:id="@+id/aboutPage"
+        android:layout_width="340dp"
+        android:layout_height="447dp"
+        android:layout_marginStart="50dp"
+        android:layout_marginTop="50dp"
+        android:layout_marginEnd="50dp"
+        android:layout_marginBottom="50dp"
+        android:visibility="invisible"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@+id/alarm_button"
-        app:layout_constraintVertical_bias="1.0" />
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.55">
+
+        <ImageButton
+            android:id="@+id/close_about"
+            android:layout_width="67dp"
+            android:layout_height="65dp"
+            android:layout_gravity="right|top|end"
+            android:layout_marginStart="24dp"
+            android:layout_marginBottom="19dp"
+            android:visibility="visible"
+            app:layout_constraintBottom_toTopOf="@+id/about_button"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.867"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:layout_constraintVertical_bias="1.0"
+            app:srcCompat="@drawable/close_s" />
+
+        <TextView
+            android:id="@+id/AboutDescription"
+            android:layout_width="271dp"
+            android:layout_height="430dp"
+            android:text="@string/Explainer"
+            android:textIsSelectable="false"
+            android:visibility="visible"
+            tools:layout_editor_absoluteX="102dp"
+            tools:layout_editor_absoluteY="95dp"
+            tools:textColor="@android:color/black" />
+
+    </FrameLayout>
+
+    <android.support.constraint.ConstraintLayout
+        android:id="@+id/contactPage"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:layout_marginStart="32dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="32dp"
+        android:layout_marginBottom="64dp"
+        android:visibility="invisible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="1.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintVertical_bias="0.0">
+
+        <TextView
+            android:id="@+id/Success"
+            android:layout_width="340dp"
+            android:layout_height="50dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginTop="48dp"
+            android:layout_marginBottom="46dp"
+            android:text="@string/Success"
+            android:textColor="#03FF29"
+            app:layout_constraintBottom_toTopOf="@+id/submitContact"
+            app:layout_constraintEnd_toStartOf="@+id/Invalid"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/phone2" />
+
+        <Button
+            android:id="@+id/submitContact"
+            android:layout_width="0dp"
+            android:layout_height="72dp"
+            android:layout_marginStart="51dp"
+            android:layout_marginTop="132dp"
+            android:layout_marginEnd="90dp"
+            android:layout_marginBottom="17dp"
+            android:text="@string/submitbutton"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toBottomOf="@+id/phone2" />
+
+        <ImageButton
+            android:id="@+id/close_contact"
+            android:layout_width="100dp"
+            android:layout_height="75dp"
+            android:layout_gravity="right|top|end"
+            android:layout_marginStart="24dp"
+            android:visibility="visible"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent"
+            app:srcCompat="@drawable/close_s" />
+
+        <EditText
+            android:id="@+id/phone2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="134dp"
+            android:layout_marginBottom="245dp"
+            android:autofillHints="true"
+            android:background="#12B348"
+            android:ems="10"
+            android:hint="@string/phone_no2"
+            android:inputType="phone"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent" />
+
+        <EditText
+            android:id="@+id/Name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="7dp"
+            android:layout_marginTop="98dp"
+            android:layout_marginEnd="127dp"
+            android:layout_marginBottom="41dp"
+            android:autofillHints="true"
+            android:background="#12B348"
+            android:ems="10"
+            android:hint="@string/Name"
+            android:inputType="text"
+            app:layout_constraintBottom_toTopOf="@+id/phone1"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="1.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <EditText
+            android:id="@+id/phone1"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="16dp"
+            android:layout_marginTop="184dp"
+            android:layout_marginEnd="118dp"
+            android:layout_marginBottom="117dp"
+            android:autofillHints="true"
+            android:background="#12B348"
+            android:ems="10"
+            android:hint="@string/phone_no1"
+            android:inputType="phone"
+            app:layout_constraintBottom_toTopOf="@+id/phone2"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintHorizontal_bias="0.0"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+        <TextView
+            android:id="@+id/Invalid"
+            android:layout_width="523dp"
+            android:layout_height="45dp"
+            android:layout_marginStart="3dp"
+            android:layout_marginEnd="28dp"
+            android:layout_marginBottom="3dp"
+            android:text="@string/Invalid"
+            android:textColor="@android:color/holo_red_dark"
+            android:visibility="invisible"
+            app:layout_constraintBottom_toTopOf="@+id/submitContact"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toEndOf="@+id/phone2"
+            app:layout_constraintTop_toBottomOf="@+id/phone2" />
+    </android.support.constraint.ConstraintLayout>
 
 </android.support.constraint.ConstraintLayout>

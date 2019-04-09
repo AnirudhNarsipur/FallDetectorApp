@@ -2,6 +2,7 @@ package com.anirudh.falldetect;
 import android.app.IntentService;
 import android.arch.lifecycle.Lifecycle;
 import android.arch.lifecycle.ProcessLifecycleOwner;
+import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
@@ -18,6 +19,7 @@ public class Raise_Alarm extends IntentService {
      static final String RAISE_ALARM = "com.anirudh.mercury.action.ALARM";
      static final String STOP = "com.anirudh.mercury.action.WARN";
     ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+    long timePassed ;
     private static boolean pressed = false;
     Handler handler = new Handler() ;
     public Raise_Alarm() {
@@ -40,6 +42,7 @@ public class Raise_Alarm extends IntentService {
             final String action = intent.getAction();
             if (RAISE_ALARM.equals(action)) {
                 setPressed(false);
+                timePassed = System.currentTimeMillis();
                 handler.post(alarm);
             } else if (STOP.equals(action)) {
                 setPressed(true);
@@ -63,6 +66,8 @@ public class Raise_Alarm extends IntentService {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
             }
+            AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
+            audioManager.adjustVolume(AudioManager.ADJUST_RAISE,AudioManager.ADJUST_UNMUTE);
             toneG.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT) ;
             if(!isPressed()) {
                 handler.post(this);
@@ -70,7 +75,14 @@ public class Raise_Alarm extends IntentService {
         }
     } ;
 
+public void hasTimePassed(){
 
+    long passed = (System.currentTimeMillis()-timePassed)/1000 ;
+    if(passed>45000) {
+        startService(new Intent(getApplicationContext(),SendMessage.class)) ;
+    }
+
+}
 
 
 }

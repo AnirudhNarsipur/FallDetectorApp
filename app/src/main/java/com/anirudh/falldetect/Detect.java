@@ -169,7 +169,7 @@ public class Detect extends Service implements SensorEventListener {
 
 
                 InputStream is = getResources().openRawResource(R.raw.mostly);
-                model = ModelSerializer.restoreComputationGraph(is) ;
+                model = ModelSerializer.restoreComputationGraph(is,false) ;
                 model.init();
                 manager.registerListener(sigmotion_detect,significant_motion,200000);
 
@@ -183,8 +183,6 @@ public class Detect extends Service implements SensorEventListener {
         float[][][] result = new float[1][6][timeStep];
 
             for (int i = 0; i < timeStep; i++) {
-
-
                 float[] acc = acc_values.removeFirst();
                 float[] gyro = gyro_values.removeFirst();
                 result[0][0][i] = gyro[0];

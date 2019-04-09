@@ -1,1 +1,1 @@
-include ':app', ':dl4j'
+include ':app'

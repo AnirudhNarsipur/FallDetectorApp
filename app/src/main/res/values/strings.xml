@@ -2,5 +2,15 @@
     <string name="app_name" translatable="false">FallDetect</string>
     <string name="Explainer" formatted="true" >The app uses machine learning to automatically detect if you fall. There is no need for you to configure any settings and an alarm
         will automatically go off if you fall. Just keep in mind to let the app run in the background for detection to happen! If there\'s a false alarm or help has arrived you can press the STOP ALARM button after which it will take some time to reset</string>
-
+    <string name="about" translatable="false">About</string>
+    <string name="settings" translatable="false">Settings</string>
+    <string name="contact" translatable="false">Set Contact Information</string>
+    <string name="Alarm" translatable="false">Stop Alarm
+    </string>
+    <string name="submitbutton" translatable="false">Submit</string>
+    <string name="phone_no1" translatable="false">Phone Number of Contact 1</string>
+    <string name="phone_no2" translatable="false">Phone Number of Contact 2</string>
+    <string name="Name" translatable="false">Your name</string>
+    <string name="Invalid" translatable="false">Invalid Phone Number</string>
+    <string name="Success" translatable="false">Success!</string>
 </resources>
