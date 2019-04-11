@@ -19,3 +19,9 @@
 # If you keep the line number information, uncomment this to
 # hide the original source file name.
 #-renamesourcefileattribute SourceFile
+#-dontnote META-INF/versions/9/module-info.class
+-android
+#-injars (!META-INF/versions/9/module-info.class)
+#-keepclasseswithmembernames class * { native <methods>; }
+#-keepattributes SourceFile, LineNumberTable
+-dontwarn

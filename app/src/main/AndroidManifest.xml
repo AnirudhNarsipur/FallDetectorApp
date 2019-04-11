@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.anirudh.falldetect">
-
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
     <uses-permission android:name="android.permission.SEND_SMS"/>
@@ -9,10 +9,10 @@
 
     <uses-feature
         android:name="android.hardware.sensor.accelerometer"
-        android:required="true" />
+        android:required="false" />
     <uses-feature
         android:name="android.hardware.sensor.gyroscope"
-        android:required="true" />
+        android:required="false" />
 
     <application
         android:allowBackup="true"

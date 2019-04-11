@@ -10,9 +10,8 @@ import android.net.Uri;
 import android.os.Bundle;
 
 import java.io.BufferedReader;
-import java.io.BufferedWriter;
+
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileReader;
 import java.net.URL;
 
@@ -36,7 +35,7 @@ public class SendMessage extends IntentService {
     protected void onHandleIntent(Intent intent) {
             sendSMS() ;
         }
-    private boolean sendSMS(){
+    private void sendSMS(){
 
         try {
            File contact  = new File(getFilesDir(),"contact.txt" ) ;
@@ -75,6 +74,10 @@ public class SendMessage extends IntentService {
 
                    }
                } ;
+
+               try {
+                   lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10, 10, locationListener);
+               } catch (SecurityException e) {}
                final String msg= name + " might have suffered a serious fall.\n" +
                        "You are recieving this message because you are their designated contact. Please check in on "+ name +
                        "\n who is currently at- \n"+ loc.toString();
@@ -89,7 +92,6 @@ public class SendMessage extends IntentService {
         catch (Exception e) {
 
         }
-        return false ;
     }
 
 

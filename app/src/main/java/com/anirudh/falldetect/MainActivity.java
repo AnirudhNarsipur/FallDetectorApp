@@ -1,9 +1,9 @@
 package com.anirudh.falldetect;
-
-import android.content.Intent;
+import android.content.Intent ;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
+
 import android.support.v7.app.AppCompatActivity;
 import android.util.Patterns;
 import android.view.View;
@@ -35,6 +35,7 @@ public class MainActivity extends AppCompatActivity {
             }
         } ;
         handler.post(s) ;
+
         final ConstraintLayout contactpage = findViewById(R.id.contactPage) ;
         final Button stop = findViewById(R.id.alarm_button) ;
         final ImageView settings_button  = findViewById(R.id.settings_button);
@@ -164,17 +165,5 @@ public class MainActivity extends AppCompatActivity {
 
 
     }
-    Thread sucess = new Thread(){
-            @Override
-        public void run() {
-                findViewById(R.id.Success).setVisibility(View.VISIBLE);
 
-                try {
-                    Thread.sleep(3000);
-                } catch (InterruptedException e) {
-
-                }
-            }
-
-    } ;
 }

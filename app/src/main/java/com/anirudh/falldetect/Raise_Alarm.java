@@ -21,10 +21,20 @@ public class Raise_Alarm extends IntentService {
     ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
     long timePassed ;
     private static boolean pressed = false;
+    boolean called ;
     Handler handler = new Handler() ;
     public Raise_Alarm() {
         super("Raise_Alarm");
         pressed = false;
+        called= false ;
+    }
+
+    public boolean isCalled() {
+        return called;
+    }
+
+    public void setCalled(boolean called) {
+        this.called = called;
     }
 
     public boolean isPressed() {
@@ -66,6 +76,9 @@ public class Raise_Alarm extends IntentService {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
             }
+            if(!isCalled()) {
+                hasTimePassed();
+            }
             AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
             audioManager.adjustVolume(AudioManager.ADJUST_RAISE,AudioManager.ADJUST_UNMUTE);
             toneG.startTone(ToneGenerator.TONE_CDMA_ABBR_ALERT) ;
@@ -78,8 +91,9 @@ public class Raise_Alarm extends IntentService {
 public void hasTimePassed(){
 
     long passed = (System.currentTimeMillis()-timePassed)/1000 ;
-    if(passed>45000) {
+    if(passed>4500) {
         startService(new Intent(getApplicationContext(),SendMessage.class)) ;
+        setCalled(true);
     }
 
 }
