@@ -21,7 +21,7 @@ public class Raise_Alarm extends IntentService {
     ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
     long timePassed ;
     private static boolean pressed = false;
-    boolean called ;
+    static boolean called ;
     Handler handler = new Handler() ;
     public Raise_Alarm() {
         super("Raise_Alarm");
@@ -33,8 +33,8 @@ public class Raise_Alarm extends IntentService {
         return called;
     }
 
-    public void setCalled(boolean called) {
-        this.called = called;
+    public void setCalled(boolean call) {
+        called = call;
     }
 
     public boolean isPressed() {
@@ -52,6 +52,7 @@ public class Raise_Alarm extends IntentService {
             final String action = intent.getAction();
             if (RAISE_ALARM.equals(action)) {
                 setPressed(false);
+                setCalled(false);
                 timePassed = System.currentTimeMillis();
                 handler.post(alarm);
             } else if (STOP.equals(action)) {
@@ -76,8 +77,13 @@ public class Raise_Alarm extends IntentService {
                 intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
                 startActivity(intent);
             }
-            if(!isCalled()) {
-                hasTimePassed();
+
+            boolean tr = !isCalled() && ( ((System.currentTimeMillis()-timePassed)/1000) > 1) ;;
+
+            if(tr) {
+                setCalled(true);
+                System.out.println("CALLING");
+                (new Handler()).post(sendMessage) ;
             }
             AudioManager audioManager = (AudioManager) getApplicationContext().getSystemService(Context.AUDIO_SERVICE);
             audioManager.adjustVolume(AudioManager.ADJUST_RAISE,AudioManager.ADJUST_UNMUTE);
@@ -88,15 +94,12 @@ public class Raise_Alarm extends IntentService {
         }
     } ;
 
-public void hasTimePassed(){
-
-    long passed = (System.currentTimeMillis()-timePassed)/1000 ;
-    if(passed>4500) {
+Runnable sendMessage = new Runnable() {
+    @Override
+    public void run() {
         startService(new Intent(getApplicationContext(),SendMessage.class)) ;
-        setCalled(true);
     }
-
-}
+} ;
 
 
 }

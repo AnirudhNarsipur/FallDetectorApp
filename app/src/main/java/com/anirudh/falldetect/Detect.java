@@ -19,7 +19,7 @@ public class Detect extends Service implements SensorEventListener {
     final int MAX_SIZE = 90 ;
     final int timeStep = 70 ;
     float threshold  = 0.5f ;
-    final int forward_look = 25;
+    final int forward_look = 20;
     final float further = 0.4f ;
     long time_passed = System.currentTimeMillis();
 
@@ -59,9 +59,10 @@ public class Detect extends Service implements SensorEventListener {
             float outputvalue = (model.output(get_vals())[0]).getFloat(0) ;
             if(outputvalue>=threshold) {
                 startService(stop);
+                reset();
 
-            } else if(outputvalue>further){
-                handler.postDelayed(timesteps,1500) ;
+            } else if(outputvalue>further && outputvalue < threshold){
+             //   handler.postDelayed(timesteps,1500) ;
             }
             model.rnnClearPreviousState();
             // acc_values.setLocked(false);
@@ -73,7 +74,7 @@ public class Detect extends Service implements SensorEventListener {
     public void reset(){
        acc_values = new CircularFifo<>(MAX_SIZE) ;
        gyro_values = new CircularFifo<>(MAX_SIZE);
-       onDestroy();
+       stopSelf();
     }
 
     Runnable timesteps = new Runnable() {

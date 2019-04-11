@@ -1,9 +1,11 @@
 package com.anirudh.falldetect;
+import android.Manifest;
 import android.content.Intent ;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.constraint.ConstraintLayout;
 
+import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Patterns;
 import android.view.View;
@@ -35,6 +37,8 @@ public class MainActivity extends AppCompatActivity {
             }
         } ;
         handler.post(s) ;
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.SEND_SMS}, 1);
+
 
         final ConstraintLayout contactpage = findViewById(R.id.contactPage) ;
         final Button stop = findViewById(R.id.alarm_button) ;
