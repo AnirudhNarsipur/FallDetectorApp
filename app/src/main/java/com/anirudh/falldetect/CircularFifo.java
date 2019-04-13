@@ -1,5 +1,6 @@
 package com.anirudh.falldetect;
 import java.util.ArrayDeque;
+import java.util.NoSuchElementException;
 
 public class CircularFifo<E> extends ArrayDeque {
 private final int MAX_SIZE ;
@@ -24,7 +25,9 @@ private final int MAX_SIZE ;
 
     @Override
     public synchronized E removeFirst() {
-
+        if(this.isEmpty()){
+            throw new NoSuchElementException();
+        }
         return (E)super.removeFirst();
     }
 }

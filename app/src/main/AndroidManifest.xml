@@ -2,11 +2,11 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:dist="http://schemas.android.com/apk/distribution"
     package="com.anirudh.falldetect">
+
     <uses-permission android:name="android.permission.BODY_SENSORS" />
     <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
-    <uses-permission android:name="android.permission.SEND_SMS"/>
-    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION"/>
-
+    <uses-permission android:name="android.permission.SEND_SMS" />
+    <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
 
     <uses-feature
         android:name="android.hardware.sensor.accelerometer"
@@ -24,8 +24,12 @@
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
         <service
+            android:name=".Detect"
+            android:enabled="true"
+            android:exported="true"></service>
+        <service
             android:name=".SendMessage"
-            android:exported="false"></service>
+            android:exported="false" />
         <service
             android:name=".Raise_Alarm"
             android:exported="false" />
@@ -40,7 +44,6 @@
 
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-
         </activity>
     </application>
 

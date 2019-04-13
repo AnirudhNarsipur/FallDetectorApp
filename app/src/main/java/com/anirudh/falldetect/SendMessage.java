@@ -26,15 +26,16 @@ import java.util.concurrent.TimeUnit;
  */
 public class SendMessage extends IntentService {
     URL loc ;
+    LocationManager lm ;
     public SendMessage() {
         super("SendMessage");
     }
 
 
 
-
     @Override
     protected void onHandleIntent(Intent intent) {
+        System.out.println("SENDING sms");
             sendSMS() ;
         }
     private void sendSMS() {
@@ -46,42 +47,46 @@ public class SendMessage extends IntentService {
                 String phone1 = getInfo.readLine();
                 String phone2 = getInfo.readLine();
                 String name = getInfo.readLine();
+                name = name.substring(1).toUpperCase() + name.substring(1) ;
                 getInfo.close();
-                try {
-                    LocationManager lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
-                    lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 10, 0, LocListener);
-                    TimeUnit.SECONDS.sleep(3);
-                } catch (SecurityException s) {
-                    s.printStackTrace();}
-                    catch (InterruptedException i) {i.printStackTrace();}
-                finally {
-                    final String msg = name + " might have suffered a serious fall.\n" +
-                            "You are recieving this message because you are their designated contact. Please check in on " + name +
-                            "\n who is currently at- \n" /*+ loc.toString()*/;
-                    SmsManager smsManager = SmsManager.getDefault();
-                    System.out.println("Message: "+msg);
-                    smsManager.sendTextMessage(phone1,null,msg,null,null);
-                    smsManager.sendTextMessage(phone2,null,msg,null,null);
-                    stopSelf();
-                }
+                lm = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                lm.requestLocationUpdates(LocationManager.GPS_PROVIDER, 0, 0, LocListener);
+                TimeUnit.SECONDS.sleep(3);
+                Location location = lm.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                final String msg = name + " might have suffered a serious fall.\n" +
+                        "You are receiving this message because you are their designated contact. Please check in on " + name ;
+                SmsManager smsManager = SmsManager.getDefault();
+                if(location!=null) {
+                    loc = new URL("http://maps.google.com/?q=" + location.getLatitude() + "," + location.getLongitude());
+                    final String msg2 = name + " is at: " + loc ;
+                    smsManager.sendTextMessage(phone1, null, msg, null, null);
+                    smsManager.sendTextMessage(phone1, null, msg2, null, null);
+                    smsManager.sendTextMessage(phone2, null, msg, null, null);
+                    smsManager.sendTextMessage(phone2, null, msg2, null, null);
+                } else {
+                    smsManager.sendTextMessage(phone1, null, msg, null, null);
+                    smsManager.sendTextMessage(phone2, null, msg, null, null);
 
                 }
+
             }
-        catch(IOException e){
-                e.printStackTrace();
-            }
-
-
-
+        } catch (SecurityException s) {
+            s.printStackTrace();
+        } catch (InterruptedException i) {
+            i.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
+
         LocationListener LocListener = new LocationListener (){
             @Override
             public void onLocationChanged(Location location) {
                 try {
                     loc = new URL("http://maps.google.com/?q=" + location.getLatitude() + "," + location.getLongitude());
-
+                    lm.removeUpdates(LocListener);
                 } catch (Exception e) {
-
+                    e.printStackTrace();
                 }
             }
 

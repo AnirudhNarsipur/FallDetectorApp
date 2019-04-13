@@ -2,7 +2,8 @@ package com.anirudh.falldetect;
 import android.Manifest;
 import android.content.Intent ;
 import android.os.Bundle;
-import android.os.Handler;
+import android.os.HandlerThread;
+import android.os.Process;
 import android.support.constraint.ConstraintLayout;
 
 import android.support.v4.app.ActivityCompat;
@@ -11,10 +12,10 @@ import android.util.Patterns;
 import android.view.View;
 import android.widget.Button;
 import android.widget.EditText;
-import android.widget.FrameLayout;
 import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import java.io.BufferedWriter;
 import java.io.File;
@@ -27,24 +28,26 @@ public class MainActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
-        Handler handler  = new Handler() ;
-        Runnable s = new Runnable(){
-            @Override
-            public void run() {
 
-                Intent intent = new Intent(getApplicationContext(),Detect.class) ;
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.SEND_SMS}, 1);
+        File contact = new File(getFilesDir(), "contact.txt");
+        if(!contact.exists()) {
+            Toast.makeText(this, "Please enter contact information", Toast.LENGTH_SHORT).show();
+        }
+        HandlerThread thread = new HandlerThread("ServiceStartArguments",
+                Process.THREAD_PRIORITY_FOREGROUND) {
+            @Override
+            public void run(){
+                Intent intent = new Intent(getApplicationContext(), Detect.class) ;
                 startService(intent) ;
             }
-        } ;
-        handler.post(s) ;
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.SEND_SMS}, 1);
-
-
+        };
+        thread.start();
         final ConstraintLayout contactpage = findViewById(R.id.contactPage) ;
         final Button stop = findViewById(R.id.alarm_button) ;
         final ImageView settings_button  = findViewById(R.id.settings_button);
         final ConstraintLayout settings_page = findViewById(R.id.settings_page) ;
-        final FrameLayout about_description = findViewById(R.id.aboutPage) ;
+        final ConstraintLayout about_description = findViewById(R.id.aboutPage) ;
         final Button setContact = findViewById(R.id.setContact);
         final ImageButton closeContact = findViewById(R.id.close_contact) ;
         final Button submit = findViewById(R.id.submitContact) ;

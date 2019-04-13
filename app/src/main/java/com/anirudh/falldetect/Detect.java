@@ -7,38 +7,51 @@ import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
 import android.hardware.SensorManager;
 import android.os.Handler;
+import android.os.HandlerThread;
 import android.os.IBinder;
+import android.os.Process;
+
 import org.deeplearning4j.nn.graph.ComputationGraph;
 import org.deeplearning4j.util.ModelSerializer;
 import org.nd4j.linalg.api.ndarray.INDArray;
 import org.nd4j.linalg.factory.Nd4j;
 
 import java.io.InputStream;
+import java.util.NoSuchElementException;
+
 
 public class Detect extends Service implements SensorEventListener {
-    final int MAX_SIZE = 90 ;
-    final int timeStep = 70 ;
-    float threshold  = 0.5f ;
+    final int MAX_SIZE = 90;
+    final int timeStep = 70;
+    float threshold = 0.5f;
     final int forward_look = 20;
-    final float further = 0.4f ;
+    final float further = 0.4f;
     long time_passed = System.currentTimeMillis();
 
-    private CircularFifo<float[]> acc_values = new CircularFifo<>(MAX_SIZE) ;
-    private CircularFifo<float[]>gyro_values = new CircularFifo<>(MAX_SIZE);
+    private CircularFifo<float[]> acc_values = new CircularFifo<>(MAX_SIZE);
+    private CircularFifo<float[]> gyro_values = new CircularFifo<>(MAX_SIZE);
 
-    float acc_current  = SensorManager.GRAVITY_EARTH;
-    float acc_previous  = SensorManager.GRAVITY_EARTH;
+    float acc_current = SensorManager.GRAVITY_EARTH;
+    float acc_previous = SensorManager.GRAVITY_EARTH;
 
-    SensorManager manager ;
-    Sensor acc_sensor ;
-    Sensor gyro_sensor ;
-    Sensor significant_motion ;
-    Intent stop  ;
+    SensorManager manager;
+    Sensor acc_sensor;
+    Sensor gyro_sensor;
+    Sensor significant_motion;
 
+    Runnable warn = new Runnable() {
+        @Override
+        public void run() {
+            Intent intent = new Intent(getApplicationContext(), Raise_Alarm.class);
+            intent.setAction(Raise_Alarm.RAISE_ALARM) ;
+            startService(intent);
+        }
+    };
     Handler handler = new Handler();
-    ComputationGraph model ;
-    public boolean isTimepassed(long t){
-        return ((t- time_passed)>4000) ;
+    ComputationGraph model;
+
+    public boolean isTimepassed(long t) {
+        return ((t - time_passed) > 4000);
     }
 
     public void setTime_passed(long time_passed) {
@@ -46,73 +59,69 @@ public class Detect extends Service implements SensorEventListener {
     }
 
 
-    Runnable detecting = new Runnable() {
+    HandlerThread detecting = new HandlerThread("Service_Proccess", Process.THREAD_PRIORITY_FOREGROUND) {
         @Override
         public void run() {
-            if(model==null) {
-                handler.post(setup);
+            if (model == null) {
+                setup() ;
             }
-           //  acc_values.setLocked(true);
-            //gyro_values.setLocked(true);
             setTime_passed(System.currentTimeMillis());
             model.rnnClearPreviousState();
-            float outputvalue = (model.output(get_vals())[0]).getFloat(0) ;
-            if(outputvalue>=threshold) {
-                startService(stop);
-                reset();
 
-            } else if(outputvalue>further && outputvalue < threshold){
-             //   handler.postDelayed(timesteps,1500) ;
-            }
-            model.rnnClearPreviousState();
-            // acc_values.setLocked(false);
-             //gyro_values.setLocked(false);
+            float outputvalue = (model.output(get_vals())[0]).getFloat(0);
+            if (outputvalue >= threshold) {
+                System.out.println("Value is " + outputvalue);
+                handler.post(warn) ;
+                acc_values = new CircularFifo<>(MAX_SIZE);
+                gyro_values = new CircularFifo<>(MAX_SIZE);
+                onDestroy();
+                stopSelf();
 
 
+            }/* else if(outputvalue>further ){
+                handler.postDelayed(timesteps,1500) ;
+            }*/
         }
     };
-    public void reset(){
-       acc_values = new CircularFifo<>(MAX_SIZE) ;
-       gyro_values = new CircularFifo<>(MAX_SIZE);
-       stopSelf();
+
+    public void reset() {
+        acc_values = new CircularFifo<>(MAX_SIZE);
+        gyro_values = new CircularFifo<>(MAX_SIZE);
+        stopSelf();
     }
 
-    Runnable timesteps = new Runnable() {
+    HandlerThread timesteps = new HandlerThread("Service_Proccess", Process.THREAD_PRIORITY_FOREGROUND) {
         @Override
         public void run() {
-            for(int i = 0 ; i <forward_look; i++) {
+            for (int i = 0; i < forward_look; i++) {
                 float outputvalue = (model.rnnTimeStep(getSingleVal()))[0].getFloat(0);
                 if (outputvalue > threshold) {
                     reset();
-                    startService(stop);
+                    handler.post(warn) ;
                     break;
                 }
             }
         }
-    } ;
+    };
 
     @Override
-    public IBinder onBind(Intent intent){
+    public IBinder onBind(Intent intent) {
         return null;
     }
-    @Override
-    public void onCreate(){
-        onStartCommand(stop,START_FLAG_REDELIVERY,1);
-    }
+
     @Override
     public int onStartCommand(Intent intent, int flags, int startId) {
         //Pulls data for analysis
-        manager = (SensorManager) getSystemService(SENSOR_SERVICE) ;
+        manager = (SensorManager) getSystemService(SENSOR_SERVICE);
         significant_motion = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         acc_sensor = manager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        gyro_sensor = manager.getDefaultSensor(Sensor.TYPE_GYROSCOPE) ;
+        gyro_sensor = manager.getDefaultSensor(Sensor.TYPE_GYROSCOPE);
 
-        manager.registerListener(Detect.this,acc_sensor,50000);
-        manager.registerListener(Detect.this,gyro_sensor,50000) ;
+        manager.registerListener(Detect.this, acc_sensor, 50000);
+        manager.registerListener(Detect.this, gyro_sensor, 50000);
 
-        handler.postDelayed(setup,2000);
-        stop = new Intent(this,Raise_Alarm.class) ;
-        stop.setAction(Raise_Alarm.RAISE_ALARM) ;
+        setup() ;
+
         return START_STICKY;
 
     }
@@ -120,29 +129,24 @@ public class Detect extends Service implements SensorEventListener {
     SensorEventListener sigmotion_detect = new SensorEventListener() {
         @Override
         public void onSensorChanged(SensorEvent event) {
-                acc_current = acc_previous ;
-                acc_current = ((float) Math.sqrt( (event.values[0] * event.values[0]) + (event.values[1] * event.values[1]) + (event.values[2] * event.values[2]) ));
+            acc_current = acc_previous;
+            acc_current = ((float) Math.sqrt((event.values[0] * event.values[0]) + (event.values[1] * event.values[1]) + (event.values[2] * event.values[2])));
 
-                float delta  =acc_current-acc_previous ;
+            float delta = acc_current - acc_previous;
 
-            if(delta > 2.00 &&isTimepassed(System.currentTimeMillis())){
+            if (delta > 2.00 && isTimepassed(System.currentTimeMillis())) {
 
-                handler.post(detecting) ;
+               detecting.start();
 
             }
-
 
 
         }
 
         @Override
         public void onAccuracyChanged(Sensor sensor, int accuracy) {
-
-
         }
-    } ;
-
-
+    };
 
 
     @Override
@@ -152,7 +156,6 @@ public class Detect extends Service implements SensorEventListener {
             //accelerometer
             case 1:
                 acc_values.addElement(event.values);
-
                 break;
             //gyrometer
             case 4:
@@ -163,35 +166,42 @@ public class Detect extends Service implements SensorEventListener {
         }
 
     }
-    Runnable setup= new Runnable() {
-        @Override
-        public void run() {
-            try{
 
+    public boolean setup()
+    {
+        try {
+            InputStream is = getResources().openRawResource(R.raw.mostly);
+            model = ModelSerializer.restoreComputationGraph(is, false);
+            model.init();
+            manager.registerListener(sigmotion_detect, significant_motion, 200000);
 
-                InputStream is = getResources().openRawResource(R.raw.mostly);
-                model = ModelSerializer.restoreComputationGraph(is,false) ;
-                model.init();
-                manager.registerListener(sigmotion_detect,significant_motion,200000);
-
-            }catch (Exception e) {
-                e.printStackTrace();
-            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false ;
         }
-    } ;
+        return true ;
+    }
+
+
     private INDArray get_vals(){
         INDArray ind  ;
         float[][][] result = new float[1][6][timeStep];
 
             for (int i = 0; i < timeStep; i++) {
-                float[] acc = acc_values.removeFirst();
-                float[] gyro = gyro_values.removeFirst();
-                result[0][0][i] = gyro[0];
-                result[0][1][i] = gyro[1];
-                result[0][2][i] = gyro[2];
-                result[0][3][i] = acc[0];
-                result[0][4][i] = acc[1];
-                result[0][5][i] = acc[2];
+                try {
+                    float[] acc = acc_values.removeFirst();
+                    float[] gyro = gyro_values.removeFirst();
+                    result[0][0][i] = gyro[0];
+                    result[0][1][i] = gyro[1];
+                    result[0][2][i] = gyro[2];
+                    result[0][3][i] = acc[0];
+                    result[0][4][i] = acc[1];
+                    result[0][5][i] = acc[2];
+
+                } catch (NoSuchElementException no){
+                    System.out.println("ERROR");
+                    return Nd4j.zeros(new int[]{1,6,timeStep});
+                }
 
             }
 
@@ -203,20 +213,24 @@ public class Detect extends Service implements SensorEventListener {
         INDArray ind  ;
         float[][][] result = new float[1][6][1];
         int i = 0;
-        float[] acc = acc_values.removeFirst();
-        float[] gyro = gyro_values.removeFirst();
-        result[0][0][i] = gyro[0];
-        result[0][1][i] = gyro[1];
-        result[0][2][i] = gyro[2];
-        result[0][3][i] = acc[0];
-        result[0][4][i] = acc[1];
-        result[0][5][i] = acc[2];
+        try {
+            float[] acc = acc_values.removeFirst();
+            float[] gyro = gyro_values.removeFirst();
+            result[0][0][i] = gyro[0];
+            result[0][1][i] = gyro[1];
+            result[0][2][i] = gyro[2];
+            result[0][3][i] = acc[0];
+            result[0][4][i] = acc[1];
+            result[0][5][i] = acc[2];
+
+        } catch (NoSuchElementException no){
+            System.out.println("ERROR");
+            return Nd4j.zeros(new int[]{1,6,1});
+        }
         ind = Nd4j.create(result);
         return ind ;
     }
     @Override
-    public void onAccuracyChanged(Sensor s, int i) {
-
-    }
+    public void onAccuracyChanged(Sensor s, int i) {}
 
 }
