@@ -24,4 +24,4 @@
 #-injars (!META-INF/versions/9/module-info.class)
 #-keepclasseswithmembernames class * { native <methods>; }
 #-keepattributes SourceFile, LineNumberTable
--dontwarn
+-dontshrink

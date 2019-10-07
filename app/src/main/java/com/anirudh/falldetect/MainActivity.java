@@ -29,10 +29,11 @@ public class MainActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
-        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.SEND_SMS}, 1);
+        ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION,Manifest.permission.SEND_SMS,
+                Manifest.permission.BODY_SENSORS}, 1);
         File contact = new File(getFilesDir(), "contact.txt");
         if(!contact.exists()) {
-            Toast.makeText(this, "Please enter contact information", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getApplicationContext(), "Please enter contact information", Toast.LENGTH_LONG).show();
         }
         HandlerThread thread = new HandlerThread("ServiceStartArguments",
                 Process.THREAD_PRIORITY_FOREGROUND) {

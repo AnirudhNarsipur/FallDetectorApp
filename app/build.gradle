@@ -7,12 +7,19 @@ android {
         applicationId "com.anirudh.falldetect"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 4
+        versionCode 14
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         resConfigs "en"
-       /* splits{
+        aaptOptions {
+            noCompress "tflite"
+            noCompress 'tripura1.tflite'
+        }
+
+
+
+        splits{
             abi {
 
                 // Enables building multiple APKs per ABI.
@@ -25,12 +32,12 @@ android {
                 reset()
 
                 // Specifies a list of ABIs that Gradle should create APKs for.
-                include "x86"
+            include "x86",   "x86_64"
 
                 // Specifies that we do not want to also generate a universal APK that includes all ABIs.
                 universalApk false
             }
-        }*/
+        }
 
 
 
@@ -39,8 +46,8 @@ android {
     buildTypes {
         release {
 
-
-            minifyEnabled false
+            shrinkResources true
+            minifyEnabled true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
 
@@ -61,9 +68,10 @@ android {
 
     }
 
-
-
 }
+
+
+
 repositories {
 
     mavenLocal()
@@ -78,55 +86,7 @@ dependencies {
     testImplementation 'junit:junit:4.12'
     androidTestImplementation 'com.android.support.test:runner:1.0.2'
     androidTestImplementation 'com.android.support.test.espresso:espresso-core:3.0.2'
-    implementation 'com.google.code.gson:gson:2.8.2'
-    implementation('org.deeplearning4j:deeplearning4j-core:1.0.0-SNAPSHOT') {
-        exclude group: 'org.bytedeco', module: 'opencv-platform'
-        exclude group: 'org.bytedeco', module: 'leptonica-platform'
-        exclude group: 'org.bytedeco', module: 'hdf5-platform'
-        exclude group: 'org.bytedeco', module: 'leptonica'
-        exclude group: 'org.bytedeco', module: 'ffmpeg'
-        exclude group: 'org.bytedeco', module: 'flycapture'
-        exclude group: 'org.bytedeco', module: 'libfreenct'
-        exclude group: 'org.bytedeco', module: 'libdc'
-        exclude group: 'org.bytedeco', module: 'librealsense'
-        exclude group: 'org.bytedeco', module: 'hdf5-platform'
-        exclude group: 'org.nd4j', module: 'nd4j-base64'
-        exclude group: 'org.bytedeco' ,module: 'mkl'
-        exclude group: 'org.bytedeco' ,module: 'mkl-dnn'
-        exclude group: 'org.datavec' ,module: 'datavec-data-image'
-        exclude group: 'org.deeplearning4j' ,module: 'nearestneighbor-core'
-        exclude group: 'org.deeplearning4j' ,module: 'ui-components'
-        exclude group: 'org.deeplearning4j' ,module: 'datasets'
-
-    }
-
-   implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-SNAPSHOT'
-    implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.5-1.5-SNAPSHOT'
-    implementation group: 'org.bytedeco', name: 'opencv', version: '4.0.1-1.5-SNAPSHOT'
-
-    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-SNAPSHOT', classifier: "android-arm64"
-    implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.5-1.5-SNAPSHOT', classifier: "android-arm64"
-    implementation group: 'org.bytedeco', name: 'opencv', version: '4.0.1-1.5-SNAPSHOT', classifier: "android-arm64"
-    /*
-    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-SNAPSHOT', classifier: "android-arm64"
-    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-SNAPSHOT', classifier: "android-x86"
-    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-SNAPSHOT', classifier: "android-x86_64"
-
-
-
-    implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.5-1.5-SNAPSHOT', classifier: "android-arm64"
-    implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.5-1.5-SNAPSHOT', classifier: "android-x86"
-    implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.5-1.5-SNAPSHOT', classifier: "android-x86_64"
-
-    implementation group: 'org.bytedeco', name: 'opencv', version: '4.0.1-1.5-SNAPSHOT', classifier: "android-arm64"
-    implementation group: 'org.bytedeco', name: 'opencv', version: '4.0.1-1.5-SNAPSHOT', classifier: "android-x86"
-    implementation group: 'org.bytedeco', name: 'opencv', version: '4.0.1-1.5-SNAPSHOT', classifier: "android-x86_64" 
-    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-SNAPSHOT'
-    implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.5-1.5-SNAPSHOT'
-    implementation group: 'org.bytedeco', name: 'opencv', version: '4.0.1-1.5-SNAPSHOT'
-    implementation group: 'org.nd4j', name: 'nd4j-native', version: '1.0.0-SNAPSHOT', classifier: "android-arm"
-    implementation group: 'org.bytedeco', name: 'openblas', version: '0.3.5-1.5-SNAPSHOT', classifier: "android-arm"
-    implementation group: 'org.bytedeco', name: 'opencv', version: '4.0.1-1.5-SNAPSHOT', classifier: "android-arm" */
+    implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly'
 
     def lifecycle_version = "1.1.1"
     implementation "android.arch.lifecycle:extensions:$lifecycle_version"

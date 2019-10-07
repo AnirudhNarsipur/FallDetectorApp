@@ -6,7 +6,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.media.AudioManager;
 import android.media.ToneGenerator;
-import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.Process;
 
@@ -23,8 +22,6 @@ public class Raise_Alarm extends IntentService {
      static final String STOP = "com.anirudh.mercury.action.WARN";
     ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
     long timePassed ;
-    Handler handler = new Handler() ;
-    Handler handler1 = new Handler() ;
     private static boolean pressed = false;
     static boolean called ;
     public Raise_Alarm() {

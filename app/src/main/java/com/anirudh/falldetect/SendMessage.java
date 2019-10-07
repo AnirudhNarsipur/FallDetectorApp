@@ -1,5 +1,4 @@
 package com.anirudh.falldetect;
-
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.Context;
@@ -8,9 +7,7 @@ import android.location.LocationListener;
 import android.location.LocationManager;
 import android.os.Bundle;
 import android.telephony.SmsManager;
-
 import java.io.BufferedReader;
-
 import java.io.File;
 import java.io.FileReader;
 import java.io.IOException;
@@ -21,7 +18,6 @@ import java.util.concurrent.TimeUnit;
  * An {@link IntentService} subclass for handling asynchronous task requests in
  * a service on a separate handler thread.
  * <p>
- * TODO: Customize class - update intent actions, extra parameters and static
  * helper methods.
  */
 public class SendMessage extends IntentService {

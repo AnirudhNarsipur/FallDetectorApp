@@ -1,7 +1,9 @@
 package com.anirudh.falldetect;
 
+
 import android.app.Service;
 import android.content.Intent;
+import android.content.res.AssetFileDescriptor;
 import android.hardware.Sensor;
 import android.hardware.SensorEvent;
 import android.hardware.SensorEventListener;
@@ -11,22 +13,29 @@ import android.os.HandlerThread;
 import android.os.IBinder;
 import android.os.Process;
 
-import org.deeplearning4j.nn.graph.ComputationGraph;
-import org.deeplearning4j.util.ModelSerializer;
-import org.nd4j.linalg.api.ndarray.INDArray;
-import org.nd4j.linalg.factory.Nd4j;
 
-import java.io.InputStream;
+import org.tensorflow.lite.Interpreter;
+
+
+import java.io.FileInputStream;
+
+import java.io.IOException;
+
+import java.nio.MappedByteBuffer;
+import java.nio.channels.FileChannel;
+
 import java.util.NoSuchElementException;
 
 
 public class Detect extends Service implements SensorEventListener {
+
     final int MAX_SIZE = 90;
     final int timeStep = 70;
     float threshold = 0.5f;
-    final int forward_look = 20;
-    final float further = 0.4f;
+
     long time_passed = System.currentTimeMillis();
+
+    Interpreter tf_interpreter ;
 
     private CircularFifo<float[]> acc_values = new CircularFifo<>(MAX_SIZE);
     private CircularFifo<float[]> gyro_values = new CircularFifo<>(MAX_SIZE);
@@ -48,7 +57,7 @@ public class Detect extends Service implements SensorEventListener {
         }
     };
     Handler handler = new Handler();
-    ComputationGraph model;
+
 
     public boolean isTimepassed(long t) {
         return ((t - time_passed) > 4000);
@@ -62,23 +71,28 @@ public class Detect extends Service implements SensorEventListener {
     HandlerThread detecting = new HandlerThread("Service_Proccess", Process.THREAD_PRIORITY_FOREGROUND) {
         @Override
         public void run() {
-            if (model == null) {
+            if (tf_interpreter == null) {
                 setup() ;
             }
+            try{
             setTime_passed(System.currentTimeMillis());
-            model.rnnClearPreviousState();
 
-            float outputvalue = (model.output(get_vals())[0]).getFloat(0);
+            float[][] outputval = new float[1][1];
+            float[][][] test = new float[1][70][6];
+            tf_interpreter.run(get_vals(),outputval);
+
+            float outputvalue = outputval[0][0] ;
             if (outputvalue >= threshold) {
                 System.out.println("Value is " + outputvalue);
-                handler.post(warn) ;
+                handler.post(warn);
                 acc_values = new CircularFifo<>(MAX_SIZE);
                 gyro_values = new CircularFifo<>(MAX_SIZE);
                 onDestroy();
                 stopSelf();
+            }
 
-
-            }/* else if(outputvalue>further ){
+            }catch (Exception e ){ e.printStackTrace();}
+            /* else if(outputvalue>further ){
                 handler.postDelayed(timesteps,1500) ;
             }*/
         }
@@ -90,19 +104,7 @@ public class Detect extends Service implements SensorEventListener {
         stopSelf();
     }
 
-    HandlerThread timesteps = new HandlerThread("Service_Proccess", Process.THREAD_PRIORITY_FOREGROUND) {
-        @Override
-        public void run() {
-            for (int i = 0; i < forward_look; i++) {
-                float outputvalue = (model.rnnTimeStep(getSingleVal()))[0].getFloat(0);
-                if (outputvalue > threshold) {
-                    reset();
-                    handler.post(warn) ;
-                    break;
-                }
-            }
-        }
-    };
+
 
     @Override
     public IBinder onBind(Intent intent) {
@@ -167,12 +169,20 @@ public class Detect extends Service implements SensorEventListener {
 
     }
 
+    private MappedByteBuffer loadModelFile() throws IOException {
+        AssetFileDescriptor fileDescriptor = getAssets().openFd("tripura1.tflite");
+        FileInputStream inputStream = new FileInputStream(fileDescriptor.getFileDescriptor());
+        FileChannel fileChannel = inputStream.getChannel();
+        long startOffset = fileDescriptor.getStartOffset();
+        long declaredLength = fileDescriptor.getDeclaredLength();
+        return fileChannel.map(FileChannel.MapMode.READ_ONLY, startOffset, declaredLength);
+    }
+
     public boolean setup()
     {
         try {
-            InputStream is = getResources().openRawResource(R.raw.mostly);
-            model = ModelSerializer.restoreComputationGraph(is, false);
-            model.init();
+
+            tf_interpreter = new Interpreter(loadModelFile()) ;
             manager.registerListener(sigmotion_detect, significant_motion, 200000);
 
         } catch (Exception e) {
@@ -183,52 +193,51 @@ public class Detect extends Service implements SensorEventListener {
     }
 
 
-    private INDArray get_vals(){
-        INDArray ind  ;
-        float[][][] result = new float[1][6][timeStep];
+    private float[][][] get_vals(){
+
+        float[][][] result = new float[1][timeStep][6];
 
             for (int i = 0; i < timeStep; i++) {
                 try {
                     float[] acc = acc_values.removeFirst();
                     float[] gyro = gyro_values.removeFirst();
-                    result[0][0][i] = gyro[0];
-                    result[0][1][i] = gyro[1];
-                    result[0][2][i] = gyro[2];
-                    result[0][3][i] = acc[0];
-                    result[0][4][i] = acc[1];
-                    result[0][5][i] = acc[2];
+                    result[0][i][0] = gyro[0];
+                    result[0][i][1] = gyro[1];
+                    result[0][i][2] = gyro[2];
+                    result[0][i][3] = acc[0];
+                    result[0][i][4] = acc[1];
+                    result[0][i][5] = acc[2];
 
                 } catch (NoSuchElementException no){
                     System.out.println("ERROR");
-                    return Nd4j.zeros(new int[]{1,6,timeStep});
+                    return  result;
                 }
 
             }
 
-        ind = Nd4j.create(result);
-        return ind ;
+        return result ;
     }
 
-    private INDArray getSingleVal(){
-        INDArray ind  ;
-        float[][][] result = new float[1][6][1];
-        int i = 0;
+    private float[][][] getSingleVal(){
+
+        float[][][] result = new float[1][1][6];
+
         try {
             float[] acc = acc_values.removeFirst();
             float[] gyro = gyro_values.removeFirst();
-            result[0][0][i] = gyro[0];
-            result[0][1][i] = gyro[1];
-            result[0][2][i] = gyro[2];
-            result[0][3][i] = acc[0];
-            result[0][4][i] = acc[1];
-            result[0][5][i] = acc[2];
+            result[0][0][0] = gyro[0];
+            result[0][0][1] = gyro[1];
+            result[0][0][2] = gyro[2];
+            result[0][0][3] = acc[0];
+            result[0][0][4] = acc[1];
+            result[0][0][5] = acc[2];
 
         } catch (NoSuchElementException no){
             System.out.println("ERROR");
-            return Nd4j.zeros(new int[]{1,6,1});
+            return result ;
         }
-        ind = Nd4j.create(result);
-        return ind ;
+        return  result ;
+
     }
     @Override
     public void onAccuracyChanged(Sensor s, int i) {}
