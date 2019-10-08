@@ -7,7 +7,7 @@ android {
         applicationId "com.anirudh.falldetect"
         minSdkVersion 24
         targetSdkVersion 28
-        versionCode 14
+        versionCode 16
         versionName "1.0"
         testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
@@ -17,7 +17,7 @@ android {
             noCompress 'tripura1.tflite'
         }
 
-
+/*
 
         splits{
             abi {
@@ -38,7 +38,7 @@ android {
                 universalApk false
             }
         }
-
+*/
 
 
     }
